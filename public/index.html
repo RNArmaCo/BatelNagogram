@@ -1,0 +1,494 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title data-i18n="pageTitle">BatelNagogram — پیام‌رسان امن گروهی</title>
+
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Vazirmatn:wght@400;500;700;800&display=swap"
+        />
+        <link rel="stylesheet" href="style.css" />
+    </head>
+
+    <body>
+        <header class="header">
+            <div class="header-left">
+                <div class="logo-badge" aria-hidden="true">
+                    <span>BN</span>
+                </div>
+
+                <div class="room-block">
+                    <div class="room-title" id="roomTitle">BatelNagogram</div>
+                    <div class="room-subtitle">
+                        <span
+                            id="roomIdDisplay"
+                            class="mono"
+                            data-i18n-title="clickCopyLink"
+                            >---</span
+                        >
+                        <span
+                            id="roomEpochBadge"
+                            class="epoch-badge mono"
+                        ></span>
+                        <span id="roomLockState"></span>
+                        <span class="secure-indicator">
+                            <span class="dot"></span>
+                            <span data-i18n="secureConn">ارتباط امن</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="header-actions">
+                <button
+                    class="icon-btn"
+                    id="langSwitchBtn"
+                    type="button"
+                    title="EN / FA"
+                >
+                    EN
+                </button>
+                <button
+                    class="icon-btn"
+                    id="dmDrawerBtn"
+                    type="button"
+                    data-i18n-title="privateMessages"
+                    hidden
+                >
+                    ✉
+                </button>
+                <button
+                    class="icon-btn"
+                    id="switchRoomBtn"
+                    type="button"
+                    data-i18n-title="switchRoom"
+                    hidden
+                >
+                    ⇄
+                </button>
+                <button
+                    class="icon-btn"
+                    id="copyLinkBtn"
+                    type="button"
+                    data-i18n-title="copyLink"
+                >
+                    🔗
+                </button>
+                <button
+                    class="icon-btn"
+                    id="roomSettingsBtn"
+                    type="button"
+                    data-i18n-title="roomSettings"
+                >
+                    ⚙
+                </button>
+                <button
+                    class="icon-btn"
+                    id="logoutBtn"
+                    type="button"
+                    data-i18n-title="logout"
+                    hidden
+                >
+                    ⎋
+                </button>
+            </div>
+        </header>
+
+        <section class="users-bar">
+            <div class="users-bar-title">
+                <span data-i18n="activeUsers">کاربران فعال</span>
+            </div>
+            <div class="users-list" id="activeUsersList">
+                <span class="user-pill muted" data-i18n="loading"
+                    >در حال بارگذاری...</span
+                >
+            </div>
+            <div class="typing-indicator" id="typingIndicator"></div>
+        </section>
+
+        <main class="chat-container" id="chatContainer">
+            <div class="empty-chat" id="emptyHint" data-i18n="emptyChat">
+                هنوز پیامی نیست. شروع کنید!
+            </div>
+        </main>
+
+        <footer class="input-area">
+            <div class="reply-preview" id="replyPreview">
+                <span id="replyText"></span>
+                <button
+                    class="cancel-reply"
+                    id="cancelReply"
+                    type="button"
+                    data-i18n-title="cancelReply"
+                >
+                    ✕
+                </button>
+            </div>
+
+            <div class="input-row">
+                <input type="file" id="fileInput" multiple />
+
+                <button
+                    class="btn"
+                    id="fileBtn"
+                    type="button"
+                    data-i18n-title="sendFile"
+                    disabled
+                >
+                    📎
+                </button>
+
+                <div class="composer">
+                    <textarea
+                        id="msgInput"
+                        rows="1"
+                        data-i18n-placeholder="waitingSecure"
+                        disabled
+                    ></textarea>
+                </div>
+
+                <button
+                    class="btn"
+                    id="sendBtn"
+                    type="button"
+                    disabled
+                    data-i18n-title="send"
+                >
+                    ➤
+                </button>
+            </div>
+        </footer>
+
+        <div class="toast-wrap" id="toastWrap"></div>
+
+        <!-- Account auth modal: unique username + login token -->
+        <div class="overlay show" id="authModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <div class="modal-title" data-i18n="authTitle">
+                        ورود / ثبت‌نام در BatelNagogram
+                    </div>
+                </div>
+
+                <div class="modal-body">
+                    <div class="mode-switch">
+                        <button
+                            type="button"
+                            class="ghost-btn action-btn active-mode"
+                            id="modeLoginBtn"
+                            data-i18n="loginTab"
+                        >
+                            ورود با توکن
+                        </button>
+                        <button
+                            type="button"
+                            class="ghost-btn action-btn"
+                            id="modeRegisterBtn"
+                            data-i18n="registerTab"
+                        >
+                            ثبت‌نام یکتا
+                        </button>
+                    </div>
+
+                    <div class="field">
+                        <label class="label" data-i18n="usernameLabel"
+                            >نام کاربری یکتا</label
+                        >
+                        <input
+                            type="text"
+                            class="input"
+                            id="authUsernameInput"
+                            maxlength="30"
+                            data-i18n-placeholder="usernamePlaceholder"
+                        />
+                    </div>
+
+                    <div class="field" id="authTokenField">
+                        <label class="label" data-i18n="tokenLabel"
+                            >توکن ورود</label
+                        >
+                        <input
+                            type="password"
+                            class="input mono"
+                            id="authTokenInput"
+                            data-i18n-placeholder="tokenPlaceholder"
+                        />
+                    </div>
+
+                    <div class="hint" data-i18n="noPiiHint">
+                        هیچ ایمیل، شماره یا اطلاعات هویتی ذخیره نمی‌شود. در
+                        ثبت‌نام فقط یک توکن اختصاصی دریافت می‌کنید.
+                    </div>
+
+                    <div
+                        class="warning-box"
+                        id="authWarning"
+                        style="display: none"
+                    ></div>
+
+                    <div
+                        class="token-reveal"
+                        id="tokenRevealBox"
+                        style="display: none"
+                    >
+                        <div class="label" data-i18n="saveTokenLabel">
+                            توکن شما (فقط یک‌بار نمایش داده می‌شود):
+                        </div>
+                        <div
+                            class="status-line mono"
+                            id="newTokenDisplay"
+                        ></div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button
+                        class="primary-btn action-btn"
+                        id="authSubmitBtn"
+                        type="button"
+                        data-i18n="loginBtn"
+                    >
+                        ورود
+                    </button>
+                    <button
+                        class="primary-btn action-btn"
+                        id="tokenContinueBtn"
+                        type="button"
+                        style="display: none"
+                        data-i18n="continueBtn"
+                    >
+                        ادامه
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Join / create room modal -->
+        <div class="overlay" id="joinModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <div class="modal-title" data-i18n="joinCreateTitle">
+                        ورود / ایجاد اتاق
+                    </div>
+                </div>
+
+                <div class="modal-body">
+                    <div
+                        class="status-line"
+                        id="joinRoomSummary"
+                        data-i18n="checkingRoom"
+                    >
+                        در حال بررسی اتاق...
+                    </div>
+
+                    <div class="field">
+                        <label class="label" data-i18n="roomCodeOrLinkLabel"
+                            >کد ۸ رقمی هگز یا لینک دعوت</label
+                        >
+                        <input
+                            type="text"
+                            class="input mono"
+                            id="joinRoomTargetInput"
+                            placeholder="a1b2c3d4 یا https://...?room=a1b2c3d4"
+                        />
+                    </div>
+
+                    <div class="field" id="roomNameField">
+                        <label class="label" data-i18n="roomNameLabel"
+                            >نام اتاق</label
+                        >
+                        <input
+                            type="text"
+                            class="input"
+                            id="joinRoomNameInput"
+                            maxlength="100"
+                            data-i18n-placeholder="roomNamePlaceholder"
+                        />
+                    </div>
+
+                    <div class="field" id="roomPasswordField">
+                        <label class="label" data-i18n="roomPasswordLabel"
+                            >رمز اتاق</label
+                        >
+                        <input
+                            type="password"
+                            class="input"
+                            id="joinPasswordInput"
+                            maxlength="200"
+                            data-i18n-placeholder="optionalPlaceholder"
+                        />
+                    </div>
+
+                    <div class="hint" id="joinHint" data-i18n="joinHintText">
+                        با ورود هر کاربر جدید، دوره رمزنگاری اتاق به‌روز می‌شود
+                        تا کاربران جدید نتوانند پیام‌های قدیمی‌تر را رمزگشایی
+                        کنند.
+                    </div>
+
+                    <div
+                        class="warning-box"
+                        id="joinWarning"
+                        style="display: none"
+                    ></div>
+                </div>
+
+                <div class="modal-footer">
+                    <button
+                        class="ghost-btn action-btn"
+                        id="generateRoomBtn"
+                        type="button"
+                        data-i18n="randomRoomBtn"
+                    >
+                        کد تصادفی
+                    </button>
+                    <button
+                        class="primary-btn action-btn"
+                        id="joinSubmitBtn"
+                        type="button"
+                        data-i18n="continueBtn"
+                    >
+                        ادامه
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Room settings modal -->
+        <div class="overlay" id="settingsModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <div class="modal-title" data-i18n="roomSettings">
+                        تنظیمات اتاق
+                    </div>
+                    <button
+                        class="icon-btn"
+                        id="settingsCloseBtn"
+                        type="button"
+                    >
+                        ✕
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="status-line">
+                        <span data-i18n="roomIdLabel">شناسه اتاق:</span>
+                        <span class="mono" id="settingsRoomId"></span>
+                    </div>
+
+                    <div class="field">
+                        <label class="label" data-i18n="roomNameLabel"
+                            >نام اتاق</label
+                        >
+                        <input
+                            type="text"
+                            class="input"
+                            id="roomNameInput"
+                            maxlength="100"
+                            data-i18n-placeholder="roomNamePlaceholder"
+                        />
+                    </div>
+
+                    <div class="field">
+                        <label class="label" data-i18n="newRoomPassLabel"
+                            >رمز جدید اتاق</label
+                        >
+                        <input
+                            type="password"
+                            class="input"
+                            id="roomPasswordInput"
+                            maxlength="200"
+                            data-i18n-placeholder="optionalPlaceholder"
+                        />
+                    </div>
+
+                    <div class="hint" data-i18n="settingsHint">
+                        اگر رمز را خالی ذخیره کنید، رمز اتاق حذف می‌شود. فقط
+                        سازنده اتاق می‌تواند این تنظیمات را تغییر دهد.
+                    </div>
+
+                    <div
+                        class="warning-box"
+                        id="settingsWarning"
+                        style="display: none"
+                    ></div>
+                </div>
+
+                <div class="modal-footer">
+                    <button
+                        class="ghost-btn action-btn"
+                        id="settingsCancelBtn"
+                        type="button"
+                        data-i18n="closeBtn"
+                    >
+                        بستن
+                    </button>
+                    <button
+                        class="primary-btn action-btn"
+                        id="saveSettingsBtn"
+                        type="button"
+                        data-i18n="saveSettingsBtn"
+                    >
+                        ذخیره تنظیمات
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Private Messages (ECDH P-256 + AES-256-GCM) modal -->
+        <div class="overlay" id="dmModal">
+            <div class="modal dm-modal">
+                <div class="modal-header">
+                    <div
+                        class="modal-title"
+                        id="dmModalTitle"
+                        data-i18n="privateMessages"
+                    >
+                        پیام‌های خصوصی
+                    </div>
+                    <button class="icon-btn" id="dmCloseBtn" type="button">
+                        ✕
+                    </button>
+                </div>
+
+                <div class="modal-body dm-body">
+                    <div class="dm-peers" id="dmPeersList"></div>
+
+                    <div class="dm-thread-wrap">
+                        <div class="dm-messages" id="dmMessagesLog">
+                            <div class="hint" data-i18n="selectPeerHint">
+                                یک کاربر را برای گفتگوی خصوصی رمزنگاری‌شده
+                                انتخاب کنید.
+                            </div>
+                        </div>
+                        <div
+                            class="typing-indicator"
+                            id="dmTypingIndicator"
+                        ></div>
+                        <div class="composer">
+                            <textarea
+                                id="dmInput"
+                                rows="1"
+                                data-i18n-placeholder="dmPlaceholder"
+                                disabled
+                            ></textarea>
+                            <button
+                                class="btn"
+                                id="dmSendBtn"
+                                type="button"
+                                disabled
+                            >
+                                ➤
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script type="module" src="app.js"></script>
+    </body>
+</html>
